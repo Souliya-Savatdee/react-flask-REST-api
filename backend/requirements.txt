@@ -1,0 +1,10 @@
+pipenv
+flask
+flask-sqlalchemy
+psycopg2
+python-dotenv
+flask-cors
+Flask-JWT-Extended
+flask_admin
+flask_migrate
+flask-swagger
