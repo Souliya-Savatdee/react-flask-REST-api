@@ -5,13 +5,16 @@ from datetime import timedelta
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class Config:
-    SECRET_KEY = config('SECRET_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # SQLALCHEMY_TRACK_MODIFICATIONS = config('SQLALCHEMY_TRACK_MODIFICATIONS',cast=bool)       #same
-
+    
 
 class DevConfig(Config):
     SQLALCHEMY_DATABASE_URI = config('DATABASE_URI')
+    JWT_SECRET_KEY = config('JWT_SECRET_KEY')
+    
     SQLALCHEMY_ECHO = True
     BEBUG = True
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=3)
@@ -21,7 +24,7 @@ class DevConfig(Config):
 class ProdConfig(Config):
     SQLALCHEMY_DATABASE_URI = config('DATABASE_URI')
     JWT_SECRET_KEY = config('JWT_SECRET_KEY')
-    SECRET_KEY = config('SECRET_KET')
+
     
     DEBUG = False
     SQLALCHEMY_ECHO = False

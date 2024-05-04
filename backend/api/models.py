@@ -49,11 +49,15 @@ class Recipe(db.Model):
     #     }
 
 class User(db.Model):
+    __tablename__ = 'user'
+    
     id = Column(Integer, primary_key=True)
     username = Column(String(25), nullable=False,unique=True)
     email = Column(String(80), nullable=False)
     password = Column(String(170), nullable=False)
-
+    role_id = Column(Integer, nullable=False)
+    
+    
     def __repr__(self):
         return f'<User {self.username}>'
     

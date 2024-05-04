@@ -3,8 +3,16 @@ import { Link } from "react-router-dom";
 import { Modal, Form, Button } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useAuth } from "../middleware/auth";
+
 import Recipe from "../pages/Recipe";
+
+import useAuth from "../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
+
+
+
+
+
 
 function LoggedInHome() {
   const [recipes, setRecipes] = useState([]);
@@ -194,9 +202,10 @@ function LoggedOutHome() {
 }
 
 function HomePage() {
-  const [logged] = useAuth();
+  const isToken = localStorage.getItem("access_token")
 
-  return <div>{logged ? <LoggedInHome /> : <LoggedOutHome />}</div>;
+
+  return <div>{isToken ? <LoggedInHome /> : <LoggedOutHome />}</div>;
 }
 
 export default HomePage;

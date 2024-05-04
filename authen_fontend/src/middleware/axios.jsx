@@ -1,13 +1,16 @@
 import axios from "axios"; // Import Axios
+BASE_URL = "http://127.0.0.1:5000/";
 
-
-const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:5000/', // Your API base URL
+export default axios.create({
+  baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-    
+    "Content-Type": "application/json",
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
-export default axiosInstance;
+export const axiosPrivate = axios.create({
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});

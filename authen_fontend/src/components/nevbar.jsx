@@ -5,63 +5,97 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/main.css";
 import { Link, useNavigate } from "react-router-dom";
 
+import { jwtDecode } from "jwt-decode";
 
-// import { useAuth, logout } from "../middleware/auth";
+import useAuth from "../hooks/useAuth";
+import { useContext } from "react";
+import AuthContext from "../context/authProvider";
+// import { useAuth } from "../middleware/auth";
+
+// const logout = async () => {
 
 
-function LoggedInLinks() {
-  return (
-    <>
-      <Nav.Link as={Link} to="/">
-        Home
-      </Nav.Link>
+//   const navigate = useNavigate();
+//   // const { logout } = useAuth();
 
-      <Nav.Link as={Link} to="/create_recipe">
-        Create Recipe
-      </Nav.Link>
+//     localStorage.clear() // Clear the token from local storage
+//     // logout();
+//     navigate("/");
+//     // window.location.reload();
+// }
 
-      <Nav.Link
-        as={Link}
-        to="/#"
-        onClick={() => {
-          logout();
-        }}
-      >
-        Log Out
-      </Nav.Link>
-    </>
-  );
-}
-
-function logout(){
-  localStorage.clear()
-  useNavigate('/')
-}
-
-function LoggedOutLinks() {
-  
-  return (
-    <>
-      <Nav.Link as={Link} to="/">
-        Home
-      </Nav.Link>
-
-      <Nav.Link as={Link} to="/login">
-        Login
-      </Nav.Link>
-
-      <Nav.Link as={Link} to="/signup">
-        Sign Up
-      </Nav.Link>
-    </>
-  );
-}
 
 
 function NavBar() {
-  // const [logged] = useAuth();
-  const isToken = localStorage.getItem("access_token");
+  const { auth } = useAuth();
+
+  const accessToken = auth?.access_token || "";
+  const decodedToken = accessToken ? jwtDecode(accessToken) : null;
+  const navigate = useNavigate();
+  const { setAuth } = useContext(AuthContext);
+
+
+  const logout = async () => {
+
   
+      localStorage.clear() // Clear the token from local storage
+      setAuth({});
+      navigate("/");
+      location.reload();
+  }
+
+
+  function LoggedOutLinks() {
+    return (
+      <>
+        <Nav.Link as={Link} to="/">
+          Home
+        </Nav.Link>
+  
+        <Nav.Link as={Link} to="/login">
+          Login
+        </Nav.Link>
+  
+        <Nav.Link as={Link} to="/signup">
+          Sign Up
+        </Nav.Link>
+      </>
+    );
+  }
+  
+  function LoggedInUserLinks() {
+    return (
+      <>
+        <Nav.Link as={Link} to="/">
+          Home
+        </Nav.Link>
+  
+        <Nav.Link as={Link} to="/#" onClick={logout}>
+          Log Out
+        </Nav.Link>
+      </>
+    );
+  }
+
+  function LoggedInAdminLinks() {
+    return (
+      <>
+        <Nav.Link as={Link} to="/">
+          Home
+        </Nav.Link>
+  
+        <Nav.Link as={Link} to="/create_recipe">
+          Create Recipe
+        </Nav.Link>
+  
+        <Nav.Link as={Link} to="/#" onClick={logout}>
+          Log Out
+        </Nav.Link>
+      </>
+    );
+  }
+
+
   return (
     <Navbar
       bg="dark"
@@ -74,7 +108,15 @@ function NavBar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {isToken ? <LoggedInLinks /> : <LoggedOutLinks />}
+            {auth.access_token ? (
+              decodedToken?.role === "admin" ? (
+                <LoggedInAdminLinks />
+              ) : (
+                <LoggedInUserLinks />
+              )
+            ) : (
+              <LoggedOutLinks />
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

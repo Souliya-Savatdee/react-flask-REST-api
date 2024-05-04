@@ -13,10 +13,10 @@ python-dotenv = "*"
 flask-cors = "*"
 flask-jwt-extended = "*"
 flask-admin = "*"
-flask-migrate = "*"
 flask-swagger = "*"
 flask-restx = "*"
 python-decouple = "*"
+flask-migrate = "*"
 
 [dev-packages]
 

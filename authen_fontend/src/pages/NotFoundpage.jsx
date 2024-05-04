@@ -1,6 +1,7 @@
 import React from "react";
 
 const NotFoundPage = () => {
+  localStorage.clear()
   return (
     <div className="404 page container">
       <h1>404 - Page Not Found</h1>

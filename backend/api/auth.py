@@ -9,13 +9,15 @@ from api.models import db , User
 
 auth_ns = Namespace('auth',description="A namespace for our Authentication")
 
+
+
 #Model
 signup_model = auth_ns.model(
     'SignUp',
     {
         "username": fields.String(),
         "email": fields.String(),
-        "password": fields.String()
+        "password": fields.String(),
     }
 )
    
@@ -41,16 +43,22 @@ class SignUp(Resource):
         data = request.get_json()
 
         username = data.get('username')
+        password = data.get('password')
+        
 
+        
         db_user = User.query.filter_by(username=username).first() 
 
         if db_user is not None:
             return make_response(jsonify({"message":f'User with username {username} already exists'}),HTTP_400_BAD_REQUEST)
 
+        hash_password = generate_password_hash(data.get('password'))
+
         new_User = User(
-            username = data.get('username'),                               #input in body json
-            email = data.get('email'),                                     #input in body json
-            password = generate_password_hash(data.get('password'))
+            username = username,                               #input in body json
+            email = password,                                     #input in body json
+            password = hash_password,
+            role_id = 2
         )
 
         new_User.SAVE()
@@ -82,7 +90,10 @@ class Login(Resource):
         if not isPassowrdCorrect:
             return make_response(jsonify({"message":"Invalid username/password"}), HTTP_400_BAD_REQUEST)
 
-        access_token = create_access_token(identity = db_Username.id, additional_claims={'role': "admin"})
+        role = "admin" if db_Username.role_id == 1 else "user"
+
+
+        access_token = create_access_token(identity = db_Username.id, additional_claims={'role': role})
         refresh_token = create_refresh_token(identity = db_Username.id)
 
         return make_response(jsonify({"access_token":access_token,"refresh_token":refresh_token,"email":db_Username.email}), HTTP_200_OK)
