@@ -30,9 +30,9 @@ function App() {
           <Route path="/login" element={<LoginPage />}>
             {" "}
           </Route>
-          <Route path="*" element={<NotFoundPage />} />
-          
           <Route path="/unauthorized" element={<Unauthorized />} />
+
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
     </Router>

@@ -2,52 +2,52 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Modal, Form, Button } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import axios from "../middleware/axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import Recipe from "../pages/Recipe";
+import useAxiosIntereptor from "../middleware/interceptors";
 
-import useAuth from "../hooks/useAuth";
-import { jwtDecode } from "jwt-decode";
-
-
-
-
-
+// import useAuth from "../hooks/useAuth";
+// import { jwtDecode } from "jwt-decode";
 
 function LoggedInHome() {
   const [recipes, setRecipes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [recipeId, setRecipeId] = useState(null);
+  const axiosPrivate = useAxiosIntereptor();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-    reset,
   } = useForm();
-  
+
   useEffect(() => {
     getAllRecipes();
   }, []);
-  
-  const token = localStorage.getItem("access_token");
+
+  const access_token = localStorage.getItem("access_token");
 
   //Get all recipes
   const getAllRecipes = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/recipe/recipes");
+      const response = await axios.get("recipe/recipes");
       setRecipes(response.data);
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }
   };
 
-
   const handleClose = () => setShowModal(false);
 
-  const handleShow = (id) => () =>{
+  const handleShow = (id) => () => {
     setShowModal(true);
-    setRecipeId(id)
+    setRecipeId(id);
     recipes.forEach((recipe) => {
       if (recipe.id === id) {
         setValue("title", recipe.title),
@@ -56,65 +56,60 @@ function LoggedInHome() {
     });
   };
 
-
-
-
   //Update recipe
   const onSubmitUpdate = async (formData) => {
     console.log(formData);
     try {
-      const response = await axios.put(
-        `http://127.0.0.1:5000/recipe/recipe/${recipeId}`,
+      const response = await axiosPrivate.put(
+        `recipe/recipe/${recipeId}`,
         formData,
         {
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${JSON.parse(token)}`,
+            Authorization: `Bearer ${JSON.parse(access_token)}`,
           },
         }
       );
       console.log("Updated Successfully");
 
       //re-update data
-      getAllRecipes()
-      setShowModal(false)
-
-      // const reload = window.location.reload()
-      // reload() 
+      getAllRecipes();
+      setShowModal(false);
 
     } catch (error) {
-      if (error.response.status === 400) {
+      if (error?.response?.status === 400) {
         console.log("Error response:", error.response.data);
       } else {
         console.log("Other error:", error.message);
+        console.log("Token is expired, Clear all tokens, Please try again");
+        //redirect to login
+        navigate("/login", { state: { from: location }, replace: true });
       }
     }
   };
 
   const onSubmitDelete = async (id) => {
     try {
-      const response = await axios.delete(
-        `http://127.0.0.1:5000/recipe/recipe/${id}`,
-        
+      const response = await axiosPrivate.delete(
+        `recipe/recipe/${id}`,
         {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${JSON.parse(token)}`,
+            Authorization: `Bearer ${JSON.parse(access_token)}`,
           },
         }
       );
       console.log("Deleted Successfully");
       getAllRecipes();
     } catch (error) {
-      if (error.response.status === 400) {
+      if (error?.response?.status === 400) {
         console.log("Error response:", error.response.data);
       } else {
         console.log("Other error:", error.message);
+        console.log("Token is expired, Clear all tokens, Please try again");
+        //redirect to login
+        navigate("/login", { state: { from: location }, replace: true });
       }
     }
-  }
-
-
+  };
 
   return (
     <div className="recipes page container">
@@ -183,7 +178,7 @@ function LoggedInHome() {
           title={recipe.title}
           description={recipe.description}
           onClickChange={handleShow(recipe.id)}
-          onClickDelete ={()=>(onSubmitDelete(recipe.id))}
+          onClickDelete={() => onSubmitDelete(recipe.id)}
         />
       ))}
     </div>
@@ -202,8 +197,7 @@ function LoggedOutHome() {
 }
 
 function HomePage() {
-  const isToken = localStorage.getItem("access_token")
-
+  const isToken = localStorage.getItem("access_token");
 
   return <div>{isToken ? <LoggedInHome /> : <LoggedOutHome />}</div>;
 }

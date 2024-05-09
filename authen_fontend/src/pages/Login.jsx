@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { Button, Form, Alert } from "react-bootstrap";
-import { Link, useNavigate, useLocation, } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-// import { jwtDecode } from "jwt-decode";
+import axios  from "../middleware/axios";
+
 
 import useAuth from "../hooks/useAuth";
 
-
 const LoginPage = () => {
-
+  // console.clear();
   localStorage.clear();
+
   const {
     register,
     handleSubmit,
@@ -21,24 +21,20 @@ const LoginPage = () => {
   //auth context
   const { setAuth } = useAuth();
 
-  const [show, setShow] = useState(false);               //Alerts
+  const [show, setShow] = useState(false); //Alerts
   const [serverResponse, setServerResponse] = useState("");
-
 
   //redirect and react-router-dom
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/"
-
-
+  const from = location.state?.from?.pathname || "/";
 
   const onSubmit = async (formData) => {
-    
     console.log(formData);
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/auth/login",
+        "auth/login",
         formData,
         {
           headers: {
@@ -47,25 +43,21 @@ const LoginPage = () => {
         }
       );
       if (response) {
-        const access_token = response.data.access_token
-        const refresh_token = response.data.refresh_token
+        const access_token = response.data.access_token;
+        const refresh_token = response.data.refresh_token;
 
-        // login(access_token);
-        setAuth({access_token});
 
-        localStorage.setItem("access_token",`"${access_token}"`)
-        localStorage.setItem("refresh_token",`"${refresh_token}"`)
-        
-        
+        setAuth({ access_token });
+
+        localStorage.setItem("access_token", `"${access_token}"`);
+        localStorage.setItem("refresh_token", `"${refresh_token}"`);
 
         setServerResponse("");
         setShow(false);
 
         //Redirect after Login success
-        navigate(from, {replace: true});
-
+        navigate(from, { replace: true });
       }
-
 
       // reset();
     } catch (error) {

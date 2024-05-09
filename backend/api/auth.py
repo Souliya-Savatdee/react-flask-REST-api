@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import request, jsonify, make_response
 from flask_restx import Resource ,fields, Namespace
 from werkzeug.security import generate_password_hash,check_password_hash
-from flask_jwt_extended import JWTManager,jwt_required, create_access_token, create_refresh_token, get_jwt_identity
-from constans.http_status_code import HTTP_200_OK,HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from flask_jwt_extended import jwt_required, create_access_token, create_refresh_token, get_jwt_identity,get_jwt
+from constans.http_status_code import HTTP_200_OK,HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from flask_cors import cross_origin
 from api.models import db , User
 
@@ -94,7 +94,7 @@ class Login(Resource):
 
 
         access_token = create_access_token(identity = db_Username.id, additional_claims={'role': role})
-        refresh_token = create_refresh_token(identity = db_Username.id)
+        refresh_token = create_refresh_token(identity = db_Username.id, additional_claims={'role': role})
 
         return make_response(jsonify({"access_token":access_token,"refresh_token":refresh_token,"email":db_Username.email}), HTTP_200_OK)
 
@@ -105,11 +105,16 @@ class RefreshResource(Resource):
 
     @cross_origin(origins='http://localhost:5173', supports_credentials=True)
     @jwt_required(refresh=True)
-    def post(self):
+    def get(self):
+        try:
+            current_user = get_jwt_identity()
 
-        current_user = get_jwt_identity()
+            current_token = get_jwt()
+            role = current_token['role']
 
-        new_access_token = create_access_token(identity = current_user)
-        new_refresh_token = create_refresh_token(identity = current_user)
+            new_access_token = create_access_token(identity = current_user, additional_claims={'role': role})
+            new_refresh_token = create_refresh_token(identity = current_user, additional_claims={'role': role})
 
-        return make_response(jsonify({"access_token": new_access_token, "refresh_token":new_refresh_token}), HTTP_200_OK)
+            return make_response(jsonify({"access_token": new_access_token, "refresh_token":new_refresh_token}), HTTP_200_OK)
+        except Exception as e:
+            return make_response(jsonify({"error": str(e)}), HTTP_500_INTERNAL_SERVER_ERROR)

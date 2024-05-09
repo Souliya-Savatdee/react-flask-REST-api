@@ -42,7 +42,7 @@ const SignUp = () => {
       reset();
     } catch (error) {
       if (error.response.status === 400) {
-        console.log("Error response:", error.response.data);
+        console.log("Error response:", error.response.data.message);
         setServerResponse(error.response.data.message);
         setServerResponseStatus(error.response.status);
         setShow(true);

@@ -1,43 +1,43 @@
-import React, { useState } from "react";
+import React from "react";
 import { Form, Button } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
+
+import useAxiosIntereptor from "../middleware/interceptors";
 
 const CreateRecipePage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     reset,
   } = useForm();
-  const [show, setShow] = useState(false);
 
-  //get token from localStorage
-  const token = localStorage.getItem("access_token");
+  const axiosPrivate = useAxiosIntereptor();
+
+  const access_token = localStorage.getItem("access_token");
+
+  // const [show, setShow] = useState(false);
 
   const onSubmit = async (formData) => {
     console.log(formData);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/recipe/recipes",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${JSON.parse(token)}`,
-          },
-        }
-      );
+      const response = await axiosPrivate.post("recipe/recipes", formData, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(access_token)}`,
+        },
+      });
       console.log("Created Successfully");
       reset();
-      
     } catch (error) {
-      if (error.response.status === 400) {
-        console.log("Error response:", error.response.data);
-      } else {
-        console.log("Other error:", error.message);
-      }
+      console.log("Other errors : ", error.message);
+      console.log("Token is expired, Clear all tokens, Please try again");
+
+      //redirect to login
+      navigate("/login", { state: { from: location }, replace: true });
     }
   };
 

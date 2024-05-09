@@ -10,19 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import useAuth from "../hooks/useAuth";
 import { useContext } from "react";
 import AuthContext from "../context/authProvider";
-// import { useAuth } from "../middleware/auth";
 
-// const logout = async () => {
-
-
-//   const navigate = useNavigate();
-//   // const { logout } = useAuth();
-
-//     localStorage.clear() // Clear the token from local storage
-//     // logout();
-//     navigate("/");
-//     // window.location.reload();
-// }
 
 
 
@@ -104,7 +92,7 @@ function NavBar() {
       data-bs-theme="dark"
     >
       <Container>
-        <Navbar.Brand href="#home">Recipes</Navbar.Brand>
+        <Navbar.Brand href="/">Recipes</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

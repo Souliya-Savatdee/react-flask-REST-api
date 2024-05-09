@@ -17,8 +17,8 @@ class DevConfig(Config):
     
     SQLALCHEMY_ECHO = True
     BEBUG = True
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=3)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=2)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=5)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(seconds=10)
     
 
 class ProdConfig(Config):
