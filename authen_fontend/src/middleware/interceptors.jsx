@@ -39,6 +39,7 @@ const useAxiosIntereptor = () => {
           const newAccess_Token = await refresh();
 
           // if (!newAccess_Token) {
+          //   console.log("Token refresh failed");
           //   localStorage.removeItem("access_token");
           //   localStorage.removeItem("refresh_token");
           //   navigate("/login", { state: { from: location }, replace: true });

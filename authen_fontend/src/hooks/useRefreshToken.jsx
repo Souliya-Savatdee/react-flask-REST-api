@@ -6,7 +6,7 @@ const useRefreshToken = () => {
   const { setAuth, logout } = useAuth();
   //   const navigate = useNavigate();
   //   const location = useLocation();
-  const refresh_token = localStorage.getItem("refresh_token");
+  const refresh_token = localStorage.getItem("refresh_token") || "";
 
   const refresh = async () => {
     try {
@@ -27,7 +27,7 @@ const useRefreshToken = () => {
 
       return newAccess_Token;
     } catch (error) {
-        //Function if refresh_token is expired
+      //Function if refresh_token is expired
       if (error.response.data.msg === "Token has expired") {
         console.log("Token refresh failed. Redirecting to login...");
 

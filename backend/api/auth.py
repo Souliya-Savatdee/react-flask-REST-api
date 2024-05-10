@@ -36,7 +36,7 @@ login_model = auth_ns.model(
 @auth_ns.route('/signup')
 class SignUp(Resource):
 
-    @cross_origin(origins='http://localhost:5173', supports_credentials=True)
+
     @auth_ns.expect(signup_model)           #expect input
     def post(self):  
 
@@ -74,7 +74,7 @@ class SignUp(Resource):
 @auth_ns.route('/login')
 class Login(Resource):
 
-    @cross_origin(origins='http://localhost:5173', supports_credentials=True)
+
     @auth_ns.expect(login_model)           #expect input
     def post(self):
         data = request.get_json()
@@ -103,7 +103,7 @@ class Login(Resource):
 @auth_ns.route("/token/refresh")
 class RefreshResource(Resource):
 
-    @cross_origin(origins='http://localhost:5173', supports_credentials=True)
+
     @jwt_required(refresh=True)
     def get(self):
         try:

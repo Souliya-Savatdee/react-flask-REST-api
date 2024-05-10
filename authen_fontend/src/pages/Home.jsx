@@ -8,7 +8,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Recipe from "../pages/Recipe";
 import useAxiosIntereptor from "../middleware/interceptors";
 
-// import useAuth from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
+
 // import { jwtDecode } from "jwt-decode";
 
 function LoggedInHome() {
@@ -16,6 +17,7 @@ function LoggedInHome() {
   const [showModal, setShowModal] = useState(false);
   const [recipeId, setRecipeId] = useState(null);
   const axiosPrivate = useAxiosIntereptor();
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +33,7 @@ function LoggedInHome() {
     getAllRecipes();
   }, []);
 
-  const access_token = localStorage.getItem("access_token");
+  const access_token = localStorage.getItem("access_token")|| " ";
 
   //Get all recipes
   const getAllRecipes = async () => {
@@ -80,7 +82,8 @@ function LoggedInHome() {
         console.log("Error response:", error.response.data);
       } else {
         console.log("Other error:", error.message);
-        console.log("Token is expired, Clear all tokens, Please try again");
+        console.log("Token is expired or Don't have token. Please try again");
+
         //redirect to login
         navigate("/login", { state: { from: location }, replace: true });
       }
@@ -104,7 +107,8 @@ function LoggedInHome() {
         console.log("Error response:", error.response.data);
       } else {
         console.log("Other error:", error.message);
-        console.log("Token is expired, Clear all tokens, Please try again");
+        console.log("Token is expired or Don't have token. Please try again");
+
         //redirect to login
         navigate("/login", { state: { from: location }, replace: true });
       }
@@ -197,9 +201,11 @@ function LoggedOutHome() {
 }
 
 function HomePage() {
-  const isToken = localStorage.getItem("access_token");
+  // const isToken = localStorage.getItem("access_token");
+  const { auth } = useAuth();
 
-  return <div>{isToken ? <LoggedInHome /> : <LoggedOutHome />}</div>;
+
+  return <div>{auth?.access_token ? <LoggedInHome /> : <LoggedOutHome />}</div>;
 }
 
 export default HomePage;
